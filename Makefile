@@ -6,18 +6,21 @@ CFLAGS=-Wall -g -std=c++0x
 SRC_DIRS = ./ ./benchmarks/ ./concurrency_control/ ./storage/ ./system/
 INCLUDE = -I. -I./benchmarks -I./concurrency_control -I./storage -I./system
 
-CFLAGS += $(INCLUDE) -D NOGRAPHITE=1 -Werror -O3
-LDFLAGS = -Wall -L. -L./libs -pthread -g -lrt -std=c++0x -O3 -ljemalloc
+CFLAGS += $(INCLUDE) -D NOGRAPHITE=1 -Werror -O3 -Wno-stringop-truncation
+LDFLAGS = -Wall -L. -L./libs -pthread -g -lrt -std=c++0x -O3 -ljemalloc -ldl
 LDFLAGS += $(CFLAGS)
 
 CPPS = $(foreach dir, $(SRC_DIRS), $(wildcard $(dir)*.cpp))
 OBJS = $(CPPS:.cpp=.o)
 DEPS = $(CPPS:.cpp=.d)
 
-all:rundb
+all:rundb clock_test
 
 rundb : $(OBJS)
 	$(CC) -o $@ $^ $(LDFLAGS)
+
+clock_test : clock_test.cc
+	$(CC) -o $@ $^
 
 -include $(OBJS:%.o=%.d)
 
